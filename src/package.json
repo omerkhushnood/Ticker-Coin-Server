@@ -1,0 +1,22 @@
+{
+  "name": "ticker-coin-server",
+  "version": "1.0.0",
+  "description": "Nodejs API.",
+  "main": "index.js",
+  "dependencies": {
+    "bcrypt-nodejs": "0.0.3",
+    "body-parser": "^1.17.2",
+    "ccxt": "^1.12.76",
+    "cors": "^2.8.4",
+    "express": "^4.15.3",
+    "jsonwebtoken": "^7.4.1",
+    "mongoose": "^4.11.1"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node index"
+  },
+  "author": "Omer <omer.khushnood@gmail.com>",
+  "license": "ISC"
+}
