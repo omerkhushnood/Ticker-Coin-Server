@@ -2,6 +2,7 @@
 
 var ccxt = require('ccxt');
 
+// Filtered from available exchanges in ccxt.exchanges
 const TESTED_EXCHANGES = [
 
     '_1btcxe',
@@ -31,12 +32,21 @@ const TESTED_EXCHANGES = [
     'zaif', 'zb'
 ];
 
+// Filtered from TESTED_EXCHANGES
+const TOP_25_EXCHANGES = [
+
+    'binance','yobit','bitfinex','bitfinex2','bitstamp','cryptopia','okex','quadrigacx',
+    'liqui','bithumb','bitz','bitso','gemini','kraken','wex','coinone','hitbtc',
+    'bitflyer','vaultoro','lakebtc','coinfloor','itbit','acx','gatecoin','ccex'
+];
+
 exports.getExchanges = ()=>{
 
     return new Promise((resolve, reject)=>{
 
         // resolve(ccxt.exchanges);
-        resolve(TESTED_EXCHANGES);
+        // resolve(TESTED_EXCHANGES);
+        resolve(TOP_25_EXCHANGES);
     });
 };
 
