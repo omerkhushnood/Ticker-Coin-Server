@@ -18,14 +18,14 @@ exports.fetch_exchanges = (req, res, next)=>{
     ;
 };
 
-exports.fetch_markets = (req, res, next)=>{
+exports.get_arbitrage_pairs = (req, res, next)=>{
 
-    var exchangeName = req.params.exchangeName;
+    var exchangeIds = req.query.exchanges.split(',');
 
-    ccxtModule.getMarkets(exchangeName)
-        .then((markets)=>{
+    ccxtModule.getArbitragePairs(exchangeIds)
+        .then((pairs)=>{
 
-            res.json(markets);
+            res.json(pairs);
         })
         .catch((err)=>{
 

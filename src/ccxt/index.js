@@ -50,24 +50,6 @@ exports.getExchanges = ()=>{
     });
 };
 
-exports.getMarkets = (exchangeName)=>{
-
-    return new Promise((resolve, reject)=>{
-
-        let exchange = new ccxt[exchangeName]();
-        exchange.load_markets()
-            .then((markets)=>{
-
-                resolve(markets);
-            })
-            .catch((err)=>{
-
-                reject(err);
-            })
-        ;
-    });
-};
-
 exports.getOHLCVData = (exchangeName, marketSymbol, options)=>{
 
     return new Promise((resolve, reject)=>{
@@ -94,6 +76,102 @@ exports.getOHLCVData = (exchangeName, marketSymbol, options)=>{
                     reject(err);
                 })
             ;
+        })();
+    });
+};
+
+exports.getArbitragePairs = (exchangeIds)=>{
+
+    let proxies = [
+        '', // no proxy by default
+        'https://crossorigin.me/',
+        'https://cors-anywhere.herokuapp.com/'
+    ];
+
+    return new Promise((resolve, reject)=>{
+
+        (async ()=>{
+
+            let ids = exchangeIds;
+            let exchanges = {};
+
+            // load all markets from all exchanges 
+            for (let id of ids) {
+
+                // instantiate the exchange by id
+                let exchange = new ccxt[id] ();
+
+                // save it in a dictionary under its id for future use
+                exchanges[id] = exchange;
+
+                try{
+
+                    // load all markets from the exchange
+                    let markets = await exchange.loadMarkets();
+                }
+                catch(e){
+
+                    //
+                }
+
+                // basic round-robin proxy scheduler
+                let currentProxy = 0;
+                let maxRetries   = proxies.length;
+                
+                for (let numRetries = 0; numRetries < maxRetries; numRetries++) {
+
+                    try { // try to load exchange markets using current proxy
+
+                        exchange.proxy = proxies[currentProxy];
+                        await exchange.loadMarkets();
+
+                    } catch (e) { // rotate proxies in case of connectivity errors, catch all other exceptions
+
+                        // swallow connectivity exceptions only
+                        if (e instanceof ccxt.DDoSProtection || e.message.includes ('ECONNRESET')) {
+                            //log.bright.yellow ('[DDoS Protection Error] ' + e.message)
+                        } else if (e instanceof ccxt.RequestTimeout) {
+                            //log.bright.yellow ('[Timeout Error] ' + e.message)
+                        } else if (e instanceof ccxt.AuthenticationError) {
+                            //log.bright.yellow ('[Authentication Error] ' + e.message)
+                        } else if (e instanceof ccxt.ExchangeNotAvailable) {
+                            //log.bright.yellow ('[Exchange Not Available Error] ' + e.message)
+                        } else if (e instanceof ccxt.ExchangeError) {
+                            //log.bright.yellow ('[Exchange Error] ' + e.message)
+                        } else {
+                            throw e; // rethrow all other exceptions
+                        }
+
+                        // retry next proxy in round-robin fashion in case of error
+                        currentProxy = ++currentProxy % proxies.length;
+                    }
+                }
+            }
+
+            // get all unique symbols
+            let uniqueSymbols = ccxt.unique (ccxt.flatten (ids.map (id => exchanges[id].symbols)));
+
+            // filter out symbols that are not present on at least two exchanges
+            let arbitrableSymbols = uniqueSymbols
+                .filter (symbol => 
+                    ids.filter (id => 
+                        (exchanges[id].symbols.indexOf (symbol) >= 0)).length > 1)
+                .sort ((id1, id2) => (id1 > id2) ? 1 : ((id2 > id1) ? -1 : 0));
+
+            // print a table of arbitrable symbols
+            let table = arbitrableSymbols.map (symbol => {
+                let row = {
+
+                    symbol: symbol,
+                    presence: {}
+                };
+                for (let id of ids)
+                    if (exchanges[id].symbols.indexOf (symbol) >= 0)
+                        row.presence[id] = id;
+                return row;
+            })
+
+            resolve(table);
         })();
     });
 };

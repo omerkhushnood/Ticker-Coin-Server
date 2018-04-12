@@ -9,12 +9,12 @@ router.route('/exchanges')
     .get(ccxtCtrl.fetch_exchanges)
 ;
 
-router.route('/exchanges/:exchangeName/markets')
-    .get(ccxtCtrl.fetch_markets)
-;
-
 router.route('/exchanges/:exchangeName/markets/:marketSymbol/ohlcv')
     .get(ccxtCtrl.fetch_ohlcv_data)
+;
+
+router.route('/arbitrage')
+    .get(ccxtCtrl.get_arbitrage_pairs)
 ;
 
 module.exports = router;
