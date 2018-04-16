@@ -55,16 +55,24 @@ exports.getOHLCVData = (exchangeName, marketSymbol, options)=>{
     return new Promise((resolve, reject)=>{
 
         // Wait 2secs to avoid getting blacklisted by exchange api, in case of frequent requests.
-        (async ()=>{await new Promise(resolve => setTimeout(resolve, 2000))})();
+        (async ()=>{await new Promise(reslv => setTimeout(reslv, 2000))})();
 
         let _DEFAULT_SINCE_DATE = new Date();
         _DEFAULT_SINCE_DATE.setDate(_DEFAULT_SINCE_DATE.getDate()-1);
         _DEFAULT_SINCE_DATE = _DEFAULT_SINCE_DATE.getTime();
 
-        let exchange = new ccxt[exchangeName]();
         (async ()=>{
 
-            await exchange.load_markets();
+            let exchange = new ccxt[exchangeName]();
+
+            try{
+
+                await exchange.load_markets();
+            }
+            catch(e){
+
+                throw e;
+            }
 
             exchange.fetchOHLCV(marketSymbol, options.timeframe||'15m', options.since||_DEFAULT_SINCE_DATE, Number(options.limit)||undefined)
                 .then((OHLCVData)=>{
@@ -76,6 +84,7 @@ exports.getOHLCVData = (exchangeName, marketSymbol, options)=>{
                     reject(err);
                 })
             ;
+
         })();
     });
 };
