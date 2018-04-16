@@ -35,7 +35,7 @@ const TESTED_EXCHANGES = [
 // Filtered from TESTED_EXCHANGES
 const TOP_25_EXCHANGES = [
 
-    'binance','yobit','bitfinex','bitfinex2','bitstamp','cryptopia','okex','quadrigacx',
+    'binance','bittrex','kucoin','yobit','bitfinex','bitfinex2','bitstamp','cryptopia','okex','quadrigacx',
     'liqui','bithumb','bitz','bitso','gemini','kraken','wex','coinone','hitbtc',
     'bitflyer','vaultoro','lakebtc','coinfloor','itbit','acx','gatecoin','ccex'
 ];
